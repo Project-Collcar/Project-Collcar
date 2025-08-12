@@ -63,8 +63,18 @@ public class Car : MonoBehaviour
         }
 
         // 디버깅용: 각 바퀴의 토크와 지면 접지 여부 콘솔에 출력
-        Debug.Log($"Left MotorTorque: {rearLeft.collider.motorTorque}, IsGrounded: {rearLeft.collider.GetGroundHit(out var hit1)}");
-        Debug.Log($"Right MotorTorque: {rearRight.collider.motorTorque}, IsGrounded: {rearRight.collider.GetGroundHit(out var hit2)}");
+
+        //Debug.Log($"Left MotorTorque: {rearLeft.collider.motorTorque}, IsGrounded: {rearLeft.collider.GetGroundHit(out var hit1)}");
+        //Debug.Log($"Right MotorTorque: {rearRight.collider.motorTorque}, IsGrounded: {rearRight.collider.GetGroundHit(out var hit2)}");
+
+        if(!rearLeft.collider.GetGroundHit(out var hit1))
+        {
+            Debug.Log($"IsGrounded: {rearLeft.collider.GetGroundHit(out var hit)}");
+        }
+        if(!rearRight.collider.GetGroundHit(out var hit2))
+        {
+            Debug.Log($"IsGrounded: {rearRight.collider.GetGroundHit(out var hit)}");
+        }
 
         // 4. 계산된 값을 실제 바퀴에 적용
         // 조향: 앞바퀴에만 적용
