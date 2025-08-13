@@ -13,7 +13,8 @@ public class Car : MonoBehaviour
         // 물리 바퀴의 위치와 회전을 시각적 바퀴 모델에 동기화하는 함수
         public void UpdatePose()
         {
-            if (visual == null) return;
+            if (visual is null) return;
+
             Vector3 pos;
             Quaternion rot;
             collider.GetWorldPose(out pos, out rot);
@@ -34,68 +35,86 @@ public class Car : MonoBehaviour
     public Wheel rearRight;
 
     // 자동차의 주요 능력치 (힘, 최대 조향각, 브레이크 힘)
-    public float motorTorque = 1000000f;
+    public float motorTorque = 5000f;
     public float steerAngle = 30f;
-    public float brakeTorque = 7000f;
+    public float brakeTorque = 3000f;
 
+    private Rigidbody rb; // Rigidbody 컴포넌트를 캐싱할 변수
+
+    private void Start()
+    {
+        // 매번 GetComponent를 호출하는 것은 비효율적이므로 시작할 때 한 번만 찾아옴
+        rb = GetComponent<Rigidbody>();
+    }
 
     // 물리 업데이트 주기에 맞춰 고정된 간격으로 실행되는 함수
     private void FixedUpdate()
     {
-        // 1. 입력 받기
-        float h = Input.GetAxisRaw("Horizontal"); // 좌/우 키보드 입력 (-1, 0, 1)
-        float v = Input.GetAxisRaw("Vertical");   // 앞/뒤 키보드 입력 (-1, 0, 1)
-        bool handbrakePressed = Input.GetButton("Handbrake"); // 핸드브레이크(기본: 스페이스바) 입력
+        // 1. 입력 받기 및 데드존 처리
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+        v = Mathf.Abs(v) < 0.1f ? 0 : v; // 데드존
 
-        // 2. 입력 값으로 실제 물리력 계산
-        float motor = v * motorTorque;        // 모터 힘 계산
-        float steer = h * steerAngle;         // 조향 각도 계산
-        float brake = handbrakePressed ? brakeTorque : 0f; // 브레이크 힘 계산
+        bool handbrake = Input.GetButton("Handbrake");
 
-        // 3. 예외 처리
-        bool isForward = v > 0;
-        bool isBackward = v < 0;
+        // 2. 조향, 구동, 브레이크 값 계산
+        float steer = h * steerAngle;
+        float motor = v * motorTorque;
+        float brake = 0f;
 
-        // 전진/후진과 브레이크 동시 입력 시 동력을 0으로 만들어 충돌 방지
-        if ((isForward && isBackward) || (isForward && handbrakePressed) || (isBackward && handbrakePressed))
+        // 풋 브레이크 로직
+        if ((v < 0 && frontLeft.collider.rpm > 10) || (v > 0 && frontLeft.collider.rpm < -10))
         {
+            brake = this.brakeTorque;
             motor = 0;
         }
 
-        // 디버깅용: 각 바퀴의 토크와 지면 접지 여부 콘솔에 출력
-
-        //Debug.Log($"Left MotorTorque: {rearLeft.collider.motorTorque}, IsGrounded: {rearLeft.collider.GetGroundHit(out var hit1)}");
-        //Debug.Log($"Right MotorTorque: {rearRight.collider.motorTorque}, IsGrounded: {rearRight.collider.GetGroundHit(out var hit2)}");
-
-        if(!rearLeft.collider.GetGroundHit(out var hit1))
+        // 핸드브레이크 로직
+        if (handbrake)
         {
-            Debug.Log($"IsGrounded: {rearLeft.collider.GetGroundHit(out var hit)}");
-        }
-        if(!rearRight.collider.GetGroundHit(out var hit2))
-        {
-            Debug.Log($"IsGrounded: {rearRight.collider.GetGroundHit(out var hit)}");
+            brake = this.brakeTorque;
         }
 
-        // 4. 계산된 값을 실제 바퀴에 적용
-        // 조향: 앞바퀴에만 적용
+        // 아이들링 브레이크 로직
+        // *** 여기가 수정된 핵심 부분입니다 ***
+        if (v == 0 && h == 0 && !handbrake && rb.linearVelocity.magnitude < 0.2f)
+        {
+            motor = 0f;
+            brake = 200f; // 아이들링 브레이크 힘
+        }
+
+        // 3. 계산된 값을 실제 바퀴에 적용
         frontLeft.SetSteerAngle(steer);
         frontRight.SetSteerAngle(steer);
 
-        // 구동: 뒷바퀴에만 적용 (후륜 구동)
-        rearLeft.SetMotorTorque(motor);
-        rearRight.SetMotorTorque(motor);
+        if (!handbrake)
+        {
+            rearLeft.SetMotorTorque(motor);
+            rearRight.SetMotorTorque(motor);
+        }
+        else
+        {
+            rearLeft.SetMotorTorque(0);
+            rearRight.SetMotorTorque(0);
+        }
 
-        // 브레이크: 모든 바퀴에 적용
         frontLeft.SetBrakeTorque(brake);
         frontRight.SetBrakeTorque(brake);
         rearLeft.SetBrakeTorque(brake);
         rearRight.SetBrakeTorque(brake);
 
-        // 5. 시각적 업데이트
-        // 모든 바퀴의 3D 모델 위치와 회전을 물리 상태에 맞춰 업데이트
+        // 4. 시각적 업데이트
         frontLeft.UpdatePose();
         frontRight.UpdatePose();
         rearLeft.UpdatePose();
         rearRight.UpdatePose();
+
+        // 5. 디버깅 (필요할 때만 사용)
+        #if UNITY_EDITOR
+        // if (!rearLeft.collider.GetGroundHit(out var hit))
+        // {
+        //     Debug.Log("Rear Left Wheel is NOT grounded.");
+        // }
+        #endif
     }
 }
