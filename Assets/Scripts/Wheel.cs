@@ -11,8 +11,8 @@ public class Wheel : MonoBehaviour
     {
         wheelCollider = GetComponent<WheelCollider>();
     }
-
-    private void Update()
+    
+    private void LateUpdate()
     {
         UpdatePose();
     }
