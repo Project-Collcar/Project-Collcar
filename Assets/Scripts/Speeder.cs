@@ -14,9 +14,9 @@ public class Speeder : Car
     {
         base.Awake(); // 부모의 초기화(Rigidbody 찾기)를 먼저 실행
         
-        motorTorque = 4500f;
+        motorTorque = 6000f;
         steerAngle = 40f;
-        brakeTorque = 3000f;
+        brakeTorque = 4500f;
         gravityMultiplier = 0.9f;
     }
 
