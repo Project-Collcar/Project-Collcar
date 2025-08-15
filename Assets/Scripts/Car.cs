@@ -1,7 +1,8 @@
 using UnityEngine;
+using Fusion;
 
 // 자동차의 전체 동작을 제어하는 메인 클래스
-public class Car : MonoBehaviour
+public class Car : NetworkBehaviour
 {
     [Header("Wheels")] // 바퀴 연결 
     public Wheel frontLeft;
@@ -28,8 +29,14 @@ public class Car : MonoBehaviour
     }
 
     // 모든 차량이 공통으로 사용할 운전 로직
-    protected virtual void FixedUpdate()
+    public override void FixedUpdateNetwork()
     {
+        // 내 자동차가 아니면 아래 로직을 실행하지 않습니다.
+        if (!HasStateAuthority)
+        {
+            return;
+        }
+        
         // 1. 사용자 입력
         float steerInput = Input.GetAxis("Horizontal");
         float throttleInput  = Input.GetAxis("Vertical");

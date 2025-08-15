@@ -29,11 +29,11 @@ public class Speeder : Car
         }
     }
 
-    // 물리 효과는 FixedUpdate에서 처리합니다.
-    protected override void FixedUpdate()
+    // 물리 효과는 FixedUpdateNetwork에서 처리합니다.
+    public override void FixedUpdateNetwork()
     {
         // 1. 부모의 기본 운전 로직(핸들링, 엑셀 등)을 먼저 실행합니다.
-        base.FixedUpdate();
+        base.FixedUpdateNetwork();
 
         // 2. 만약 부스팅 상태라면, 추가로 로켓 힘을 가합니다.
         if (isBoosting)
