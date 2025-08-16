@@ -4,8 +4,7 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - Car1_Body
-  - Car1_Wheel
+  - SpeederCamera
   layers:
   - Default
   - TransparentFX

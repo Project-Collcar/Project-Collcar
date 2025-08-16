@@ -19,16 +19,7 @@ public class Speeder : Car
         brakeTorque = 4500f;
         gravityMultiplier = 0.9f;
     }
-
-    // 매 프레임 입력을 확인합니다.
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !isBoosting)
-        {
-            UseSkill1();
-        }
-    }
-
+    
     // 물리 효과는 FixedUpdateNetwork에서 처리합니다.
     public override void FixedUpdateNetwork()
     {
