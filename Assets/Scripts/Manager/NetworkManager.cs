@@ -19,7 +19,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     void Start()
     {
-        StartGame(GameMode.Host);
+        #if UNITY_EDITOR
+        StartGame(GameMode.Single);
+        #else
+        StartGame(GameMode.Shared);
+        #endif
     }
 
     public async void StartGame(GameMode mode)
@@ -27,13 +31,16 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         // NetworkRunner에게 이 스크립트가 당신의 비서(콜백)이라고 알려주는 역할.
         // 이 코드가 없으면 OnInput, OnPlayerJoined 등 어떤 메서드도 호출되지 않음.
         networkRunner.AddCallbacks(this);
+        
+        var sceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
 
         await networkRunner.StartGame(new StartGameArgs()
         {
             GameMode = mode,
             SessionName = "TestRoom",
             Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
-            PlayerCount = 6 // 최대 플레이어 수
+            SceneManager = sceneManager,
+            PlayerCount = 6
         });
     }
 
