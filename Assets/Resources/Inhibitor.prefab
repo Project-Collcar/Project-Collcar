@@ -1077,6 +1077,7 @@ GameObject:
   - component: {fileID: 6705014395422479376}
   - component: {fileID: 1567296899955372670}
   - component: {fileID: 6212116068208375735}
+  - component: {fileID: 8469794301316830256}
   m_Layer: 0
   m_Name: Inhibitor
   m_TagString: Untagged
@@ -1165,6 +1166,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 6705014395422479376}
   - {fileID: 6212116068208375735}
+  - {fileID: 8469794301316830256}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &6212116068208375735
 MonoBehaviour:
@@ -1183,3 +1185,15 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
+--- !u!114 &8469794301316830256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7694763722262773211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00b1c7065aa1f2f45a804efc2074deb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

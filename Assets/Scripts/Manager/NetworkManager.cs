@@ -10,7 +10,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     private NetworkRunner networkRunner;
     
     [Header("Player Prefab")]
-    [SerializeField] private NetworkObject playerPrefab; // 유니티 에디터에서 스폰할 자동차 프리팹을 연결해 주세요.
+    [SerializeField] private NetworkObject playerPrefab; // 유니티 에디터에서 스폰할 자동차 프리팹을 연결
     
     void Awake()
     {
@@ -56,7 +56,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         input.Set(data);
     }
     
-    // NetworkRunner가 입력을 받기 위해 호출하는 메서드입니다.
+    // NetworkRunner가 입력을 받기 위해 호출하는 메서드
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
     {
         throw new NotImplementedException();
@@ -69,11 +69,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        // 서버/호스트만 스폰 로직을 실행합니다.
+        // 서버/호스트만 스폰 로직을 실행
         if (runner.IsServer)
         {
             Debug.Log($"Player {player.PlayerId} Joined, Spawning Car.");
-            // _playerPrefab을 스폰하고, 해당 플레이어에게 입력 권한을 부여합니다.
+            // playerPrefab을 스폰하고, 해당 플레이어에게 입력 권한을 부여
             runner.Spawn(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity, player);
         }
     }
