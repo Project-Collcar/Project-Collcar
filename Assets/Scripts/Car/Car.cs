@@ -31,38 +31,44 @@ public class Car : NetworkBehaviour
     // 모든 차량이 공통으로 사용할 운전 로직
     public override void FixedUpdateNetwork()
     {
-        // 내 자동차가 아니면 아래 로직을 실행하지 않습니다.
-        if (!HasStateAuthority)
+        if (GetInput(out InputData data))
         {
-            return;
-        }
-        
-        // 1. 사용자 입력
-        float steerInput = Input.GetAxis("Horizontal");
-        float throttleInput  = Input.GetAxis("Vertical");
-        bool handBrake = Input.GetButton("HandBrake");
-        
-        // 2. 조향, 구동, 브레이크 값 계산
-        float steer = steerInput * steerAngle;
-        float motor = throttleInput * motorTorque;
-        float brake = 0f;
-        if (handBrake)
-            brake = brakeTorque;
+            Debug.Log($"Input Received - Steer: {data.steerInput}, Throttle: {data.throttleInput}, HandBrake: {data.handBrake}");
+            // 입력이 들어왔을 때만 로직을 실행
+            //if (HasStateAuthority)     -> 개발용으로 잠시 주석처리함
+            //{
+                // 1. 사용자 입력
+                float steerInput = data.steerInput;
+                float throttleInput = data.throttleInput;
+                bool handBrake = data.handBrake;
 
-        // 3. 계산된 값 적용
-        frontLeft.SetSteerAngle(steer);
-        frontRight.SetSteerAngle(steer);
-        
-        rearLeft.SetMotorTorque(motor);
-        rearRight.SetMotorTorque(motor);
-        
-        frontLeft.SetBrakeTorque(brake);
-        frontRight.SetBrakeTorque(brake);
-        rearLeft.SetBrakeTorque(brake);
-        rearRight.SetBrakeTorque(brake);
-        
-        // 4. 커스텀 중력
-        rigidBody.AddForce(Vector3.down * (9.81f * gravityMultiplier), ForceMode.Acceleration);
+                // 2. 조향, 구동, 브레이크 값 계산
+                float steer = steerInput * steerAngle;
+                float motor = throttleInput * motorTorque;
+                float brake = 0f;
+                if (handBrake)
+                    brake = brakeTorque;
+
+                // 3. 계산된 값 적용
+                frontLeft.SetSteerAngle(steer);
+                frontRight.SetSteerAngle(steer);
+
+                rearLeft.SetMotorTorque(motor);
+                rearRight.SetMotorTorque(motor);
+
+                frontLeft.SetBrakeTorque(brake);
+                frontRight.SetBrakeTorque(brake);
+                rearLeft.SetBrakeTorque(brake);
+                rearRight.SetBrakeTorque(brake);
+
+                // 4. 커스텀 중력
+                rigidBody.AddForce(Vector3.down * (9.81f * gravityMultiplier), ForceMode.Acceleration);
+                
+                // 5. 스킬 입력 처리
+                if (data.skill1) UseSkill1();
+                if (data.skill2) UseSkill2();
+            }
+        //}
     }
 
     // 자식들이 각자의 스킬을 구현할 수 있는 틀
