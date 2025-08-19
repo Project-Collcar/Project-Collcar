@@ -12,12 +12,7 @@ public class Wheel : MonoBehaviour
         wheelCollider = GetComponent<WheelCollider>();
     }
     
-    private void LateUpdate()
-    {
-        UpdatePose();
-    }
-
-    public void UpdatePose()
+    internal void UpdatePose()
     {
         if (visual is null) return;
         Vector3 pos;

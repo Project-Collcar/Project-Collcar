@@ -12,7 +12,7 @@ public class Speeder : Car
     // Speeder의 고유 능력치를 설정합니다.
     protected override void Awake()
     {
-        base.Awake(); // 부모의 초기화(Rigidbody 찾기)를 먼저 실행
+        base.Awake(); // 부모의 초기화를 먼저 실행
         
         motorTorque = 6000f;
         steerAngle = 40f;
@@ -20,16 +20,14 @@ public class Speeder : Car
         gravityMultiplier = 0.9f;
     }
     
-    // 물리 효과는 FixedUpdateNetwork에서 처리합니다.
     public override void FixedUpdateNetwork()
     {
-        // 1. 부모의 기본 운전 로직(핸들링, 엑셀 등)을 먼저 실행합니다.
+        // 부모 클래스의 기본 주행 로직을 먼저 실행
         base.FixedUpdateNetwork();
 
-        // 2. 만약 부스팅 상태라면, 추가로 로켓 힘을 가합니다.
+        // 부스터 상태일 경우, 추가적인 전진 힘을 가함
         if (isBoosting)
         {
-            // WheelCollider 토크와 별개로, Rigidbody에 직접 힘을 가합니다.
             rigidBody.AddForce(transform.forward * boostForce, ForceMode.Acceleration);
         }
     }
@@ -37,6 +35,8 @@ public class Speeder : Car
     // 부모의 UseSkill1을 덮어써서 부스터 코루틴을 시작시킵니다.
     public override void UseSkill1()
     {
+        // 이미 부스터 사용 중이면 또 사용하지 않도록 방지
+        if (isBoosting) return;
         StartCoroutine(BoostCoroutine());
     }
 
@@ -45,10 +45,7 @@ public class Speeder : Car
     {
         Debug.Log("Speeder 스킬: 부스터 발동!");
         isBoosting = true;
-
-        // boostDuration(2초) 만큼 기다립니다.
         yield return new WaitForSeconds(boostDuration);
-
         isBoosting = false;
         Debug.Log("부스터 종료!");
     }
