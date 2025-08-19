@@ -2,7 +2,7 @@ using Fusion;
 using UnityEngine;
 
 // 네트워크 입력 구조체
-public struct InputData : INetworkInput
+public struct NetworkInputData : INetworkInput
 {
     public float steerInput;
     public float throttleInput;

@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - SpeederCamera
+  - InhibitorCamera
+  - JeggernautCamera
   layers:
   - Default
   - TransparentFX
