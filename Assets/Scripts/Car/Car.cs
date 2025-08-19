@@ -34,6 +34,7 @@ public class Car : NetworkBehaviour
         if (GetInput(out InputData data))
         {
             Debug.Log($"Input Received - Steer: {data.steerInput}, Throttle: {data.throttleInput}, HandBrake: {data.handBrake}");
+            // Debug.Log("Linear Velocity : " + rigidBody.linearVelocity);
             // 입력이 들어왔을 때만 로직을 실행
             //if (HasStateAuthority)     -> 개발용으로 잠시 주석처리함
             //{
