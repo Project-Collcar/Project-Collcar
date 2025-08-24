@@ -24,7 +24,9 @@ public class Car : NetworkBehaviour
     [Networked] protected float steerInput { get; set; }
     [Networked] protected float throttleInput { get; set; }
     [Networked] protected bool handBrake { get; set; }
-
+    
+    private NetworkInputData previousInputData;
+    
     // 컴포넌트 초기화, 자식 클래스에서 확장할 수 있도록 virtual로 선언
     protected virtual void Awake()
     {
@@ -55,10 +57,12 @@ public class Car : NetworkBehaviour
             frontRight.SetBrakeTorque(brake);
             rearLeft.SetBrakeTorque(brake);
             rearRight.SetBrakeTorque(brake);
+            
+            // 자식 클래스가 스킬을 처리하도록 현재와 이전 입력 데이터를 넘김
+            HandleSkills(data, previousInputData);
 
-            // 입력 데이터에 따라 스킬 사용
-            if (data.skill1) UseSkill1();
-            if (data.skill2) UseSkill2();
+            // 다음 틱에서 사용하기 위해 현재 입력을 저장
+            previousInputData = data;
         }
 
         // 중력은 권한을 가진 클라이언트에서만 계산하여 모두에게 적용
@@ -77,13 +81,18 @@ public class Car : NetworkBehaviour
         rearLeft.UpdatePose();
         rearRight.UpdatePose();
     }
-
-    public virtual void UseSkill1()
+    
+    protected virtual void HandleSkills(NetworkInputData current, NetworkInputData previous)
+    {
+        
+    }
+    
+    protected virtual void UseSkill1()
     {
         Debug.Log("이 차량은 1번 스킬이 없음");
     }
 
-    public virtual void UseSkill2()
+    protected virtual void UseSkill2()
     {
         Debug.Log("이 차량은 2번 스킬이 없음");
     }
