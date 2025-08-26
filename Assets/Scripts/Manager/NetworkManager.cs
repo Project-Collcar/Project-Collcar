@@ -7,31 +7,37 @@ using System.Collections.Generic;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    private NetworkRunner networkRunner;
-    private static NetworkManager _instance;
+    private static NetworkManager Instance { get; set; }
+
+    private NetworkRunner runnerPrefab;
+    private NetworkRunner runnerInstance;
+    
         
     [Header("Player Prefab")]
     [SerializeField] private NetworkObject playerPrefab; // 유니티 에디터에서 스폰할 자동차 프리팹을 연결
+    
+    
     void Awake()
     {
-        // NetworkManager가 이미 존재하면 새로 생긴 것은 파괴.
-        if (_instance != null && _instance != this)
+        // NetworkManager가 이미 존재하면 새로 생긴 것은 파괴. -> this 조건은 굳이 확인하지 않아도 됨 (Awake 특성 상) - 현석
+        if (Instance != null)
         {
             Destroy(this.gameObject);
             return;
         }
 
-        // 첫 번째 NetworkManager라면 파괴되지 않도록 설정.
-        _instance = this;
+        // 첫 번째 NetworkManager라면 파괴되지 않도록 설정. -> SingleTon
+        Instance = this;
         DontDestroyOnLoad(this.gameObject);
         
-        networkRunner = GetComponent<NetworkRunner>();
+        runnerInstance = GetComponent<NetworkRunner>();
     }
 
+    //  테스트 용으로는 Start가 필요하지만, 이후에는 삭제 (UI 버튼을 통한 수동 호출로 변경)
     void Start()
     {
         // NetworkRunner가 이미 실행 중이라면 StartGame을 다시 호출하지 않음.
-        if (networkRunner.IsRunning)
+        if (runnerInstance.IsRunning)
         {
             return;
         }
@@ -43,20 +49,24 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         #endif
     }
 
-    public async void StartGame(GameMode mode)
+    public async void StartGame(GameMode mode, string sessionName = "Temp_Room")
     {
         // NetworkRunner에게 이 스크립트가 당신의 비서(콜백)이라고 알려주는 역할.
         // 이 코드가 없으면 OnInput, OnPlayerJoined 등 어떤 메서드도 호출되지 않음.
-        networkRunner.AddCallbacks(this);
-        
-        var sceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
 
-        await networkRunner.StartGame(new StartGameArgs()
+        if (runnerInstance != null) return;
+        
+        //  RunnerInstance를 RunnerPrefab에서 할당
+        runnerInstance = Instantiate(runnerPrefab);
+        runnerInstance.AddCallbacks(this);
+        
+        //  코드 간소화
+        await runnerInstance.StartGame(new StartGameArgs()
         {
             GameMode = mode,
-            SessionName = "TestRoom",
+            SessionName = sessionName,
             Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
-            SceneManager = sceneManager,
+            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
             PlayerCount = 6
         });
     }
