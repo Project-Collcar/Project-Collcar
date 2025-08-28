@@ -9,7 +9,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     private static NetworkManager Instance { get; set; }
 
-    private NetworkRunner runnerPrefab;
+    // private NetworkRunner runnerPrefab;
     private NetworkRunner runnerInstance;
     
         
@@ -54,12 +54,14 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         // NetworkRunner에게 이 스크립트가 당신의 비서(콜백)이라고 알려주는 역할.
         // 이 코드가 없으면 OnInput, OnPlayerJoined 등 어떤 메서드도 호출되지 않음.
 
-        if (runnerInstance != null) return;
+        if (runnerInstance == null)
+            runnerInstance = GetComponent<NetworkRunner>();
+
+        if (runnerInstance.IsRunning) return;
         
         //  RunnerInstance를 RunnerPrefab에서 할당
-        runnerInstance = Instantiate(runnerPrefab);
         runnerInstance.AddCallbacks(this);
-        
+    
         //  코드 간소화
         await runnerInstance.StartGame(new StartGameArgs()
         {
