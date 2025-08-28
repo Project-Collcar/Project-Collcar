@@ -1,5 +1,5 @@
-using UnityEngine;
 using Fusion;
+using UnityEngine;
 using Unity.Cinemachine;
 [RequireComponent(typeof(NetworkObject))]
 public class SpeederCamera : NetworkBehaviour
@@ -9,11 +9,11 @@ public class SpeederCamera : NetworkBehaviour
 
     public override void Spawned()
     {
-        // HasInputAuthority는 이 오브젝트가 '내 컴퓨터에서 직접 조종하는' 것인지를 확인합니다.
-        // 이 확인 절차 덕분에 다른 플레이어의 자동차에 내 카메라가 붙는 것을 막을 수 있습니다.
-        //if (HasInputAuthority)
-        //{
-            // "Speeder" 태그를 가진 게임 오브젝트를 찾습니다.
+        // HasInputAuthority는 이 오브젝트가 '내 컴퓨터에서 직접 조종하는' 것인지를 확인함.
+        // 다른 플레이어의 자동차에 내 카메라가 붙는 것을 막을 수 있음.
+        if (HasInputAuthority)
+        {
+            // "SpeederCamera" 태그를 가진 게임 오브젝트를 찾습니다.
             GameObject cameraObject = GameObject.FindWithTag("SpeederCamera");
             
             // 카메라 오브젝트를 찾았는지, 그리고 그 안에 CinemachineCamera 컴포넌트가 있는지 확인합니다.
@@ -35,7 +35,7 @@ public class SpeederCamera : NetworkBehaviour
                 // 문제를 쉽게 파악할 수 있도록 에러 로그를 남깁니다.
                 Debug.LogError("PlayerCameraSetup: Could not find GameObject with tag 'Speeder' or it's missing the CinemachineCamera component!");
             }
-        //}
+        }
         
     }
 }
