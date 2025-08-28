@@ -80,8 +80,11 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         data.throttleInput = Input.GetAxis("Vertical");
         data.steerInput = Input.GetAxis("Horizontal");
         data.handBrake = Input.GetKey(KeyCode.Space);
-        data.skill1 = Input.GetKeyDown(KeyCode.LeftShift);
-        data.skill2 = Input.GetKeyDown(KeyCode.E);
+
+        NetworkButtons buttons = default;
+        buttons.Set(InputButtons.SKILL1, Input.GetKey(KeyCode.LeftShift));
+        buttons.Set(InputButtons.SKILL2, Input.GetKey(KeyCode.E));
+        data.Buttons = buttons;
 
         // 3. 입력 데이터를 Fusion에게 전달
         input.Set(data);
@@ -100,15 +103,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        // // 서버/호스트만 스폰 로직을 실행
-        // if (runner.IsServer)
-        // {
-        //     Debug.Log($"Player {player.PlayerId} Joined, Spawning Car.");
-        //     // playerPrefab을 스폰하고, 해당 플레이어에게 입력 권한을 부여
-        //     runner.Spawn(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity, player);
-        // }
-        
-        // Shared Mode에서는 참여한 플레이어가 자기 자신일 때 캐릭터를 스폰합니다.
         if (player == runner.LocalPlayer)
         {
             Debug.Log($"I am Player {player.PlayerId}, Spawning my Car.");

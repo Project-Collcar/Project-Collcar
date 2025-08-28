@@ -859,8 +859,8 @@ GameObject:
   - component: {fileID: 3199313349186639557}
   - component: {fileID: 9169510031016259079}
   - component: {fileID: 6539106696516822314}
-  - component: {fileID: 1582236773015187772}
   - component: {fileID: 3143114336968142393}
+  - component: {fileID: 2657692666211045504}
   m_Layer: 0
   m_Name: Speeder
   m_TagString: Untagged
@@ -950,21 +950,9 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 9169510031016259079}
-  - {fileID: 1582236773015187772}
   - {fileID: 3143114336968142393}
+  - {fileID: 2657692666211045504}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &1582236773015187772
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6036943006681877870}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15b67a8fc48e0674182c48ce8b72e2db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &3143114336968142393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -988,6 +976,18 @@ MonoBehaviour:
     Position: 0.01
     Rotation: 0.01
     Scale: 0.01
+--- !u!114 &2657692666211045504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6036943006681877870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15b67a8fc48e0674182c48ce8b72e2db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6420495176729555072
 GameObject:
   m_ObjectHideFlags: 0
