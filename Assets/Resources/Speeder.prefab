@@ -104,7 +104,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -498,8 +498,6 @@ GameObject:
   - component: {fileID: 4203949844456837855}
   - component: {fileID: 1006754118517628282}
   - component: {fileID: 3034373643497335216}
-  - component: {fileID: 6100543463687639215}
-  - component: {fileID: 4495212890147234241}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -577,50 +575,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &6100543463687639215
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3538913073397549157}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 2058636971521827448, guid: 50c7d23c0e322b249b7ed74f273ff296, type: 3}
---- !u!64 &4495212890147234241
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3538913073397549157}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -6621935941269889001, guid: 50c7d23c0e322b249b7ed74f273ff296, type: 3}
 --- !u!1 &3836895325476271684
 GameObject:
   m_ObjectHideFlags: 0
@@ -905,8 +859,8 @@ GameObject:
   - component: {fileID: 3199313349186639557}
   - component: {fileID: 9169510031016259079}
   - component: {fileID: 6539106696516822314}
-  - component: {fileID: 6419629651655305671}
-  - component: {fileID: 1582236773015187772}
+  - component: {fileID: 3143114336968142393}
+  - component: {fileID: 2657692666211045504}
   m_Layer: 0
   m_Name: Speeder
   m_TagString: Untagged
@@ -954,7 +908,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -996,10 +950,10 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 9169510031016259079}
-  - {fileID: 6419629651655305671}
-  - {fileID: 1582236773015187772}
+  - {fileID: 3143114336968142393}
+  - {fileID: 2657692666211045504}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &6419629651655305671
+--- !u!114 &3143114336968142393
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1008,15 +962,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 6036943006681877870}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: 0a591d221a634417e9827eb58e17de84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _stateAuthorityChangeErrorCorrectionDelta: 0
   SyncScale: 0
-  SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
---- !u!114 &1582236773015187772
+  SyncParent: 1
+  _interpolationTarget: {fileID: 0}
+  UsePreciseRotation: 0
+  UseRenderSleepThresholds: 1
+  RenderThresholds:
+    UseEnergy: 1
+    Position: 0.01
+    Rotation: 0.01
+    Scale: 0.01
+--- !u!114 &2657692666211045504
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -7,66 +7,106 @@ using System.Collections.Generic;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    private NetworkRunner networkRunner;
+    private static NetworkManager Instance { get; set; }
+
+    private NetworkRunner runnerPrefab;
+    private NetworkRunner runnerInstance;
     
+        
     [Header("Player Prefab")]
-    [SerializeField] private NetworkObject playerPrefab; // 유니티 에디터에서 스폰할 자동차 프리팹을 연결해 주세요.
+    [SerializeField] private NetworkObject playerPrefab; // 유니티 에디터에서 스폰할 자동차 프리팹을 연결
+    
     
     void Awake()
     {
-        networkRunner = GetComponent<NetworkRunner>();
+        // NetworkManager가 이미 존재하면 새로 생긴 것은 파괴. -> this 조건은 굳이 확인하지 않아도 됨 (Awake 특성 상) - 현석
+        if (Instance != null)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+
+        // 첫 번째 NetworkManager라면 파괴되지 않도록 설정. -> SingleTon
+        Instance = this;
+        DontDestroyOnLoad(this.gameObject);
+        
+        runnerInstance = GetComponent<NetworkRunner>();
     }
 
+    //  테스트 용으로는 Start가 필요하지만, 이후에는 삭제 (UI 버튼을 통한 수동 호출로 변경)
     void Start()
     {
-        StartGame(GameMode.Host);
+        // NetworkRunner가 이미 실행 중이라면 StartGame을 다시 호출하지 않음.
+        if (runnerInstance.IsRunning)
+        {
+            return;
+        }
+        
+        #if UNITY_EDITOR
+        StartGame(GameMode.Single);
+        #else
+        StartGame(GameMode.Shared);
+        #endif
     }
 
-    public async void StartGame(GameMode mode)
+    public async void StartGame(GameMode mode, string sessionName = "Temp_Room")
     {
         // NetworkRunner에게 이 스크립트가 당신의 비서(콜백)이라고 알려주는 역할.
         // 이 코드가 없으면 OnInput, OnPlayerJoined 등 어떤 메서드도 호출되지 않음.
-        networkRunner.AddCallbacks(this);
 
-        await networkRunner.StartGame(new StartGameArgs()
+        if (runnerInstance != null) return;
+        
+        //  RunnerInstance를 RunnerPrefab에서 할당
+        runnerInstance = Instantiate(runnerPrefab);
+        runnerInstance.AddCallbacks(this);
+        
+        //  코드 간소화
+        await runnerInstance.StartGame(new StartGameArgs()
         {
             GameMode = mode,
-            SessionName = "TestRoom",
+            SessionName = sessionName,
             Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex),
-            PlayerCount = 6 // 최대 플레이어 수
+            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
+            PlayerCount = 6
         });
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        var data = new InputData();
-        
-        data.steerInput = Input.GetAxis("Horizontal");
-        data.throttleInput = Input.GetAxis("Vertical");
-        data.handBrake = Input.GetKey(KeyCode.Space);
-        data.skill1 = Input.GetKeyDown(KeyCode.LeftShift);
+        // 1. NetworkInputData 인스터스 생성
+        var data = new NetworkInputData();
 
+        // 2. Input 클래스를 사용해 현재 플레이어의 키보드 입력을 저장
+        data.throttleInput = Input.GetAxis("Vertical");
+        data.steerInput = Input.GetAxis("Horizontal");
+        data.handBrake = Input.GetKey(KeyCode.Space);
+
+        NetworkButtons buttons = default;
+        buttons.Set(InputButtons.SKILL1, Input.GetKey(KeyCode.LeftShift));
+        buttons.Set(InputButtons.SKILL2, Input.GetKey(KeyCode.E));
+        data.Buttons = buttons;
+
+        // 3. 입력 데이터를 Fusion에게 전달
         input.Set(data);
     }
     
-    // NetworkRunner가 입력을 받기 위해 호출하는 메서드입니다.
+    // NetworkRunner가 입력을 받기 위해 호출하는 메서드
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        // 서버/호스트만 스폰 로직을 실행합니다.
-        if (runner.IsServer)
+        if (player == runner.LocalPlayer)
         {
-            Debug.Log($"Player {player.PlayerId} Joined, Spawning Car.");
-            // _playerPrefab을 스폰하고, 해당 플레이어에게 입력 권한을 부여합니다.
+            Debug.Log($"I am Player {player.PlayerId}, Spawning my Car.");
+            // playerPrefab을 스폰하고, 나 자신에게 입력 권한을 부여합니다.
             runner.Spawn(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity, player);
         }
     }
@@ -78,73 +118,73 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
     {
-        throw new NotImplementedException();
+     
     }
 
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
     {
-        throw new NotImplementedException();
+        
     }
 
     
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnConnectedToServer(NetworkRunner runner)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
     {
-        throw new NotImplementedException();
+        
     }
 }

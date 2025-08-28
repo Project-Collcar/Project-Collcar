@@ -1076,7 +1076,8 @@ GameObject:
   - component: {fileID: 882023779941553610}
   - component: {fileID: 6705014395422479376}
   - component: {fileID: 1567296899955372670}
-  - component: {fileID: 6212116068208375735}
+  - component: {fileID: 8469794301316830256}
+  - component: {fileID: 7779218736873055831}
   m_Layer: 0
   m_Name: Inhibitor
   m_TagString: Untagged
@@ -1126,9 +1127,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &6705014395422479376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1164,9 +1165,10 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 6705014395422479376}
-  - {fileID: 6212116068208375735}
+  - {fileID: 8469794301316830256}
+  - {fileID: 7779218736873055831}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &6212116068208375735
+--- !u!114 &8469794301316830256
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1175,11 +1177,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 7694763722262773211}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: 00b1c7065aa1f2f45a804efc2074deb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7779218736873055831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7694763722262773211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a591d221a634417e9827eb58e17de84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _stateAuthorityChangeErrorCorrectionDelta: 0
   SyncScale: 0
-  SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
+  SyncParent: 1
+  _interpolationTarget: {fileID: 0}
+  UsePreciseRotation: 0
+  UseRenderSleepThresholds: 1
+  RenderThresholds:
+    UseEnergy: 1
+    Position: 0.01
+    Rotation: 0.01
+    Scale: 0.01

@@ -1,26 +1,33 @@
 using UnityEngine;
 using Fusion;
 
-// 자동차의 전체 동작을 제어하는 메인 클래스
+// 모든 차량의 기반이 되는 부모 클래스
 public class Car : NetworkBehaviour
 {
-    [Header("Wheels")] // 바퀴 연결 
+    [Header("Wheels")] // 주행에 사용될 4개의 Wheel 컴포넌트 연결
     public Wheel frontLeft;
     public Wheel frontRight;
     public Wheel rearLeft;
     public Wheel rearRight;
 
-    [Header("Physics")] // 물리 기능
-    public Transform centerOfMassObject;
+    [Header("Physics")] // 물리 관련 설정
+    public Transform centerOfMassObject; // 안정적인 주행을 위한 무게 중심 오브젝트
     protected Rigidbody rigidBody;
-    
-    // 자식 클래스에서 덮어쓸 능력치 변수들 
+
+    [Header("Ability")] // 차량의 기본 능력치, 자식 클래스에서 재정의 가능
     protected float motorTorque;
     protected float steerAngle;
     protected float brakeTorque;
     protected float gravityMultiplier = 1.0f;
 
-    // 자식이 덮어쓸 수 있도록 protected virtual로 선언
+    [Header("Network Properties")] // 네트워크를 통해 동기화될 플레이어의 입력 값
+    [Networked] protected float steerInput { get; set; }
+    [Networked] protected float throttleInput { get; set; }
+    [Networked] protected bool handBrake { get; set; }
+    
+    private NetworkInputData previousInputData;
+    
+    // 컴포넌트 초기화, 자식 클래스에서 확장할 수 있도록 virtual로 선언
     protected virtual void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
@@ -28,57 +35,65 @@ public class Car : NetworkBehaviour
             rigidBody.centerOfMass = centerOfMassObject.localPosition;
     }
 
-    // 모든 차량이 공통으로 사용할 운전 로직
+    // 자식 클래스에서 주행 로직을 확장할 수 있도록 virtual로 선언
     public override void FixedUpdateNetwork()
     {
-        if (GetInput(out InputData data))
+        // NetworkManager가 보내준 이번 틱의 입력 데이터를 가져옴
+        if (GetInput(out NetworkInputData data))
         {
-            Debug.Log($"Input Received - Steer: {data.steerInput}, Throttle: {data.throttleInput}, HandBrake: {data.handBrake}");
-            // 입력이 들어왔을 때만 로직을 실행
-            //if (HasStateAuthority)     -> 개발용으로 잠시 주석처리함
-            //{
-                // 1. 사용자 입력
-                float steerInput = data.steerInput;
-                float throttleInput = data.throttleInput;
-                bool handBrake = data.handBrake;
+            // 입력 값을 바탕으로 실제 물리 효과 적용
+            float steer = data.steerInput * steerAngle;
+            float motor = data.throttleInput * motorTorque;
+            float brake = 0f;
+            if (data.handBrake)
+                brake = brakeTorque;
 
-                // 2. 조향, 구동, 브레이크 값 계산
-                float steer = steerInput * steerAngle;
-                float motor = throttleInput * motorTorque;
-                float brake = 0f;
-                if (handBrake)
-                    brake = brakeTorque;
+            // 각 바퀴에 계산된 값을 전달
+            frontLeft.SetSteerAngle(steer);
+            frontRight.SetSteerAngle(steer);
+            rearLeft.SetMotorTorque(motor);
+            rearRight.SetMotorTorque(motor);
+            frontLeft.SetBrakeTorque(brake);
+            frontRight.SetBrakeTorque(brake);
+            rearLeft.SetBrakeTorque(brake);
+            rearRight.SetBrakeTorque(brake);
+            
+            // 자식 클래스가 스킬을 처리하도록 현재와 이전 입력 데이터를 넘김
+            HandleSkills(data, previousInputData);
 
-                // 3. 계산된 값 적용
-                frontLeft.SetSteerAngle(steer);
-                frontRight.SetSteerAngle(steer);
+            // 다음 틱에서 사용하기 위해 현재 입력을 저장
+            previousInputData = data;
+        }
 
-                rearLeft.SetMotorTorque(motor);
-                rearRight.SetMotorTorque(motor);
-
-                frontLeft.SetBrakeTorque(brake);
-                frontRight.SetBrakeTorque(brake);
-                rearLeft.SetBrakeTorque(brake);
-                rearRight.SetBrakeTorque(brake);
-
-                // 4. 커스텀 중력
-                rigidBody.AddForce(Vector3.down * (9.81f * gravityMultiplier), ForceMode.Acceleration);
-                
-                // 5. 스킬 입력 처리
-                if (data.skill1) UseSkill1();
-                if (data.skill2) UseSkill2();
-            }
-        //}
+        // 중력은 권한을 가진 클라이언트에서만 계산하여 모두에게 적용
+        if (Object.HasStateAuthority)
+        {
+            rigidBody.AddForce(Vector3.down * (9.81f * gravityMultiplier), ForceMode.Acceleration);
+        }
+    }
+    
+    // 모든 물리 및 네트워크 계산(보간)이 끝난 후 호출
+    // 시각적 요소를 최종적으로 업데이트하기에 적합
+    public override void Render()
+    {
+        frontLeft.UpdatePose();
+        frontRight.UpdatePose();
+        rearLeft.UpdatePose();
+        rearRight.UpdatePose();
+    }
+    
+    protected virtual void HandleSkills(NetworkInputData current, NetworkInputData previous)
+    {
+        
+    }
+    
+    protected virtual void UseSkill1()
+    {
+        Debug.Log("이 차량은 1번 스킬이 없음");
     }
 
-    // 자식들이 각자의 스킬을 구현할 수 있는 틀
-    public virtual void UseSkill1()
+    protected virtual void UseSkill2()
     {
-        Debug.Log("이 차량은 1번 스킬이 없습니다.");
-    }
-
-    public virtual void UseSkill2()
-    {
-        Debug.Log("이 차량은 2번 스킬이 없습니다.");
+        Debug.Log("이 차량은 2번 스킬이 없음");
     }
 }
