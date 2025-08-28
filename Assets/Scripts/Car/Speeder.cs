@@ -9,9 +9,6 @@ public class Speeder : Car
 
     [Networked] private TickTimer boostTimer { get; set; }  
     
-    // --- 디버그용 로컬 변수 ---
-    private bool wasBoostingLastTick = false;
-    
     // Speeder의 능력치를 설정
     protected override void Awake()
     {
@@ -31,27 +28,18 @@ public class Speeder : Car
         // 1. 타이머가 만료되었는지 확인
         if (boostTimer.Expired(Runner))
         {
-            // 2. 만료되었다면 타이머를 리셋(초기화)합니다.
+            // 2. 만료되었다면 타이머를 초기화
             boostTimer = default; // 또는 TickTimer.None
 
-            // 3. 부스터 종료 시점에 '한 번만' 실행될 로그입니다.  
+            // 3. 부스터 종료 시점에 실행  
             Debug.Log($"<color=orange>부스터 종료! (Object ID: {Object.Id})</color>");
         }
 
-        // 4. 타이머가 '실행 중'일 때만 힘을 가합니다.
-        //    위에서 만료된 타이머는 리셋되었으므로, 이 코드는 부스터 지속 시간 동안에만 실행됩니다.
+        // 4. 타이머가 실행 중일 때만 힘을 가함
         if (boostTimer.IsRunning)
         {
             rigidBody.AddForce(transform.forward * boostForce, ForceMode.Acceleration);
         }
-        
-        // --- 디버그 로그 로직 (그대로) ---
-        bool isBoostingNow = boostTimer.IsRunning;
-        if (wasBoostingLastTick && !isBoostingNow)
-        {
-            Debug.Log($"<color=orange>부스터 종료! (Object ID: {Object.Id})</color>");
-        }
-        wasBoostingLastTick = isBoostingNow;
     }
     
     // 부모가 호출해주는 HandleSkills 메서드의 내용을 채워서 스킬 발동
